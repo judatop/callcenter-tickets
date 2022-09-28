@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   HOME_ENDPOINT,
@@ -13,18 +12,24 @@ import Home from "./pages/Home";
 import NewTicket from "./pages/NewTicket";
 import Tickets from "./pages/Tickets";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { AuthProvider, useAuthState } from "./context/authContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
-  const [userLogged, setUserLogged] = useState(true);
+  const user = useAuthState();
 
   return (
-    <BrowserRouter>
-      {userLogged ? (
+    <AuthProvider>
+      <ToastContainer />
+      <BrowserRouter>
         <div>
           <div>
             <CustomNavbar />
           </div>
           <Routes>
+            <Route exact path="/" element={<Home />}></Route>
+
             <Route exact path={HOME_ENDPOINT} element={<Home />}></Route>
 
             <Route exact path={LOGIN_ENDPOINT} element={<Login />}></Route>
@@ -38,10 +43,8 @@ const App = () => {
             <Route exact path={TICKETS_ENDPOINT} element={<Tickets />}></Route>
           </Routes>
         </div>
-      ) : (
-        <Login />
-      )}
-    </BrowserRouter>
+      </BrowserRouter>
+    </AuthProvider>
   );
 };
 

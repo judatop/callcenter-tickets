@@ -2,28 +2,28 @@ import { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 
 const LoginForm = ({ errors, onSubmitCallback }) => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setshowPassword] = useState(false);
 
   const submitForm = (e) => {
     e.preventDefault();
-    onSubmitCallback({ email, password });
+    onSubmitCallback({ username, password });
   };
 
   return (
     <Form onSubmit={submitForm}>
-      <Form.Group control="email">
-        <Form.Label>Correo electronico</Form.Label>
+      <Form.Group control="username">
+        <Form.Label>Usuario</Form.Label>
         <Form.Control
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           placeholder="Correo electronico"
-          isInvalid={errors.email}
+          isInvalid={errors.username}
         />
         <Form.Control.Feedback type="invalid">
-          {errors.email}
+          {errors.username}
         </Form.Control.Feedback>
       </Form.Group>
 

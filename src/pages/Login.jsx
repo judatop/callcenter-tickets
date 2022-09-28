@@ -1,23 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import validator from "validator";
 import LoginForm from "../components/forms/LoginForm";
+import { useAuthDispatch, useAuthState } from "../context/authContext";
 import { isObjEmpty } from "../helpers/helpers.js";
+import { loginUser } from "../services/UserService";
+import { toast } from "react-toastify";
+import Spinner from "react-bootstrap/Spinner";
 
 const Login = () => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const authDispatch = useAuthDispatch();
+  const user = useAuthState();
 
-  const login = ({ email, password }) => {
+  useEffect(() => {
+    if (user.isAuthenticated) {
+      navigate("/home");
+    }
+  });
+
+  const login = async ({ username, password }) => {
     const errors = {};
     setErrors(errors);
-    if (!validator.isEmail(email)) {
-      errors.email = "El correo electronico es invalido";
+    if (validator.isEmpty(username)) {
+      errors.username = "Debe ingresar su usuario";
     }
 
     if (validator.isEmpty(password)) {
-      errors.password = "La clave no puede estar vacia";
+      errors.password = "Debe ingresar su clave";
     }
 
     if (!isObjEmpty(errors)) {
@@ -25,7 +37,36 @@ const Login = () => {
       return;
     }
 
-    navigate("/home");
+    try {
+      const response = await loginUser(username, password);
+      const token = response.data.token;
+      authDispatch({
+        type: "login",
+        token,
+      });
+      toast.success("Bienvenido " + username, {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      navigate("/home");
+    } catch (errorsAxios) {
+      errorsAxios.response.data.forEach((error) => {
+        toast.error(error.msg, {
+          position: "bottom-center",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      });
+    }
   };
 
   return (

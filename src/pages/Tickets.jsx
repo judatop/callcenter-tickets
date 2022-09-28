@@ -1,8 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Col, Container, Row, Card, ListGroup, Button } from "react-bootstrap";
 import { BsArrowRight } from "react-icons/bs";
+import { getOrders } from "../services/OrderService.jsx";
+import axios from "axios";
+import { GET_ORDERS_URL } from "../helpers/endpoints.js";
+import { useAuthState } from "../context/authContext.jsx";
 
 const Tickets = () => {
+  const [orders, setOrders] = useState([]);
+  const user = useAuthState();
+
+  // Obtenemos tickets
+  useEffect(() => {
+    axios
+      .get(GET_ORDERS_URL, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-token":
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Impvc2VtIiwiZXhwaXJhdGlvbiI6IjIwMjItMDktMjcgMjA6NDM6NTguNzg1OTc1KzAwOjAwIn0.MQYNDsnWf4OAhPESqRFNgSOihrhtUj2CyadStTwRLXQ",
+        },
+      })
+      .then((response) => {
+        setOrders(response.data.orders);
+        console.log(typeof response.data);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  }, []);
+
   return (
     <Container>
       <Row>
@@ -14,63 +40,31 @@ const Tickets = () => {
             </Card.Header>
             <Card.Body>
               <ListGroup variant="flush">
-                <ListGroup.Item>
-                  <Row>
-                    <Col xs="12" sm="12" md="10" lg="10">
-                      <b>Ticket #123</b>
-                      <p>Cliente presente servicio lento de internet</p>
-                    </Col>
-                    <Col
-                      xs="12"
-                      sm="12"
-                      md="2"
-                      lg="2"
-                      className="text-end align-self-center"
-                    >
-                      <Button size="sm">
-                        <BsArrowRight />
-                      </Button>
-                    </Col>
-                  </Row>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <Row>
-                    <Col xs="12" sm="12" md="10" lg="10">
-                      <b>Ticket #8878</b>
-                      <p>Cliente presente servicio lento de internet</p>
-                    </Col>
-                    <Col
-                      xs="12"
-                      sm="12"
-                      md="2"
-                      lg="2"
-                      className="text-end align-self-center"
-                    >
-                      <Button size="sm">
-                        <BsArrowRight />
-                      </Button>
-                    </Col>
-                  </Row>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <Row>
-                    <Col xs="12" sm="12" md="10" lg="10">
-                      <b>Ticket #4545</b>
-                      <p>Cliente presente servicio lento de internet</p>
-                    </Col>
-                    <Col
-                      xs="12"
-                      sm="12"
-                      md="2"
-                      lg="2"
-                      className="text-end align-self-center"
-                    >
-                      <Button size="sm">
-                        <BsArrowRight />
-                      </Button>
-                    </Col>
-                  </Row>
-                </ListGroup.Item>
+                {orders.map((order) => (
+                  <div>
+                    <ListGroup.Item>
+                      <Row>
+                        <Col xs="12" sm="12" md="10" lg="10">
+                          <b>Orden N° {order.id}</b>
+                          <p>{order.date}</p>
+                          <p>{order.client_ruc}</p>
+                          <p>{order.observation}</p>
+                        </Col>
+                        <Col
+                          xs="12"
+                          sm="12"
+                          md="2"
+                          lg="2"
+                          className="text-end align-self-center"
+                        >
+                          <Button size="sm">
+                            <BsArrowRight />
+                          </Button>
+                        </Col>
+                      </Row>
+                    </ListGroup.Item>
+                  </div>
+                ))}
               </ListGroup>
             </Card.Body>
           </Card>
@@ -79,7 +73,9 @@ const Tickets = () => {
           <Card>
             <Card.Body>
               <Card.Title>Ticket #123</Card.Title>
-              <Card.Subtitle className="mb-2 text-muted">En proceso</Card.Subtitle>
+              <Card.Subtitle className="mb-2 text-muted">
+                En proceso
+              </Card.Subtitle>
               <Card.Text>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
@@ -89,7 +85,9 @@ const Tickets = () => {
                 nulla pariatur. Excepteur sint occaecat cupidatat non proident,
                 sunt in culpa qui officia deserunt mollit anim id est laborum.
               </Card.Text>
-              <Card.Link href="#" className="text-danger">Eliminar</Card.Link>
+              <Card.Link href="#" className="text-danger">
+                Eliminar
+              </Card.Link>
               <Card.Link href="#">Finalizar</Card.Link>
             </Card.Body>
           </Card>
