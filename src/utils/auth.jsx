@@ -3,8 +3,11 @@ const TOKEN_KEY = "token";
 import jwtDecode from "jwt-decode";
 
 const defaultUser = {
+  id: "",
   username: "",
   token: "",
+  office: "",
+  roles: [],
   isAuthenticated: false,
 };
 
@@ -40,18 +43,21 @@ export const authenticate = (token) => {
     return { ...defaultUser };
   }
 
-  axios.defaults.headers.common["x-token"] = token;
+  axios.defaults.headers.common["Authorization"] = token;
 
   return {
     ...defaultUser,
-    username: decoded.email,
+    id: decoded.id_usuario,
+    username: decoded.user,
     isAuthenticated: true,
+    office: decoded.office_id,
+    roles: decoded.roles,
     token: _token,
   };
 };
 
 export const logout = () => {
   removeToken();
-  delete axios.defaults.headers.common["x-token"];
+  delete axios.defaults.headers.common["Authorization"];
   return { ...defaultUser };
 };

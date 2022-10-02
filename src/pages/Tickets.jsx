@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Col, Container, Row, Card, ListGroup, Button } from "react-bootstrap";
 import { BsArrowRight } from "react-icons/bs";
 import { getOrders } from "../services/OrderService.jsx";
-import axios from "axios";
-import { GET_ORDERS_URL } from "../helpers/endpoints.js";
 import { useAuthState } from "../context/authContext.jsx";
+import axios from "axios";
+import { GET_ORDERS_ENDPOINT } from "../helpers/endpoints.js";
 
 const Tickets = () => {
   const [orders, setOrders] = useState([]);
@@ -12,21 +12,31 @@ const Tickets = () => {
 
   // Obtenemos tickets
   useEffect(() => {
-    axios
-      .get(GET_ORDERS_URL, {
-        headers: {
-          "Content-Type": "application/json",
-          "x-token":
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Impvc2VtIiwiZXhwaXJhdGlvbiI6IjIwMjItMDktMjcgMjA6NDM6NTguNzg1OTc1KzAwOjAwIn0.MQYNDsnWf4OAhPESqRFNgSOihrhtUj2CyadStTwRLXQ",
-        },
-      })
-      .then((response) => {
+    const getOrders = async () => {
+      try {
+        const response = await axios.get(GET_ORDERS_ENDPOINT, {
+          headers: { Authorization: user.token },
+        });
         setOrders(response.data.orders);
-        console.log(typeof response.data);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
+      } catch (errorsAxios) {
+        console.log(errorsAxios);
+        if (errorsAxios) {
+          errorsAxios.response.data.forEach((error) => {
+            toast.error(error.msg, {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          });
+        }
+      }
+    };
+
+    getOrders();
   }, []);
 
   return (
@@ -41,8 +51,8 @@ const Tickets = () => {
             <Card.Body>
               <ListGroup variant="flush">
                 {orders.map((order) => (
-                  <div>
-                    <ListGroup.Item>
+                  <div key={order.id}>
+                    <ListGroup.Item className="shadow-sm m-1 rounded">
                       <Row>
                         <Col xs="12" sm="12" md="10" lg="10">
                           <b>Orden N° {order.id}</b>

@@ -1,9 +1,9 @@
 import axios from "axios";
-import { LOGIN_URL } from "../helpers/endpoints";
+import { LOGIN_ENDPOINT } from "../helpers/endpoints.js";
 
 export const loginUser = (username, password) => {
   return axios.post(
-    LOGIN_URL,
+    LOGIN_ENDPOINT,
     {
       username,
       password,

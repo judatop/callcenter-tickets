@@ -1,17 +1,63 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import { branchOptions } from "../../helpers/helpers";
+import {
+  GET_STATES_ENDPOINT,
+  GET_OFFICES_ENDPOINT,
+} from "../../helpers/endpoints";
+import { useAuthState } from "../../context/authContext.jsx";
+import axios from "axios";
 
 const NewTicketForm = ({ errors, onSubmitCallback }) => {
-  const [id, setId] = useState("");
-  const [name, setName] = useState("");
-  const [agreement, setAgreement] = useState("");
-  const [branch, setBranch] = useState("");
-  const [phone, setPhone] = useState("");
-  const [observations, setObservations] = useState("");
+  const user = useAuthState();
+  const [id, setId] = useState(""); // identificacion del cliente
+  const [name, setName] = useState(""); // nombre del cliente
+  const [agreement, setAgreement] = useState(""); // contrato
+  const [branch, setBranch] = useState(""); // sucursal
+  const [phone, setPhone] = useState(""); // telefono
+  const [observations, setObservations] = useState(""); // observaciones
+  const [states, setStates] = useState([]);
+  const [offices, setOffices] = useState([]);
+
+  useEffect(() => {
+    const getStates = async () => {
+      try {
+        const response = await axios.get(GET_STATES_ENDPOINT, {
+          headers: { Authorization: user.token },
+        });
+        setStates(response.data.states);
+      } catch (errorsAxios) {
+        console.log(errorsAxios);
+      }
+    };
+
+    const getOffices = async () => {
+      try {
+        const response = await axios.get(GET_OFFICES_ENDPOINT, {
+          headers: { Authorization: user.token },
+        });
+        setBranch(response.data.offices[0].name); // definimos por defecto la primera sucursal
+        setOffices(response.data.offices);
+      } catch (errorsAxios) {
+        console.log(errorsAxios);
+      }
+    };
+
+    getStates();
+    getOffices();
+  }, []);
 
   const submitForm = (e) => {
     e.preventDefault();
+
+    onSubmitCallback(
+      id,
+      name,
+      agreement,
+      offices.find((office) => office.name === branch),
+      phone,
+      observations,
+      states.find((state) => state.state === "Generado")
+    );
   };
 
   return (
@@ -75,7 +121,7 @@ const NewTicketForm = ({ errors, onSubmitCallback }) => {
               onChange={(e) => setBranch(e.target.value)}
               isInvalid={errors.branch}
             >
-              {branchOptions.map((item, index) => (
+              {offices.map((item, index) => (
                 <option key={index}>{item.name}</option>
               ))}
             </Form.Select>
@@ -120,6 +166,12 @@ const NewTicketForm = ({ errors, onSubmitCallback }) => {
           </Form.Group>
         </Col>
       </Row>
+
+      <div className="text-center">
+        <Button variant="primary" type="submit">
+          Crear
+        </Button>
+      </div>
     </Form>
   );
 };

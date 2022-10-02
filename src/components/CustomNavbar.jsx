@@ -1,11 +1,7 @@
 import React from "react";
 import { Nav, Navbar, NavDropdown, Container } from "react-bootstrap";
 import { Navigate, NavLink, useNavigate } from "react-router-dom";
-import {
-  HOME_ENDPOINT,
-  NEW_TICKET_ENDPOINT,
-  TICKETS_ENDPOINT,
-} from "../helpers/endpoints";
+import { HOME_URL, NEW_TICKET_URL, TICKETS_URL } from "../helpers/urls.js";
 import { useAuthDispatch, useAuthState } from "../context/authContext";
 
 const CustomNavbar = () => {
@@ -25,15 +21,15 @@ const CustomNavbar = () => {
       {user.isAuthenticated ? (
         <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
           <Container>
-            <Navbar.Brand href={HOME_ENDPOINT}>Inicio</Navbar.Brand>
+            <Navbar.Brand href={HOME_URL}>Inicio</Navbar.Brand>
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
 
             <Navbar.Collapse id="responsive-navbar-nav" className="mr-5">
               <Nav className="me-auto">
-                <Nav.Link as={NavLink} to={NEW_TICKET_ENDPOINT}>
+                <Nav.Link as={NavLink} to={NEW_TICKET_URL}>
                   Crear ticket
                 </Nav.Link>
-                <Nav.Link as={NavLink} to={TICKETS_ENDPOINT}>
+                <Nav.Link as={NavLink} to={TICKETS_URL}>
                   Mis tickets
                 </Nav.Link>
               </Nav>

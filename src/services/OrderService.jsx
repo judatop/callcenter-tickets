@@ -1,6 +1,6 @@
 import axios from "axios";
-import { GET_ORDERS_URL } from "../helpers/endpoints.js";
+import { GET_ORDERS_ENDPOINT } from "../helpers/endpoints.js";
 
 export const getOrders = () => {
-  return axios.get(GET_ORDERS_URL);
+  return axios.get(GET_ORDERS_ENDPOINT);
 };

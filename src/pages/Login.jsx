@@ -55,17 +55,20 @@ const Login = () => {
       });
       navigate("/home");
     } catch (errorsAxios) {
-      errorsAxios.response.data.forEach((error) => {
-        toast.error(error.msg, {
-          position: "bottom-center",
-          autoClose: 1000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
+      console.log(errorsAxios);
+      if (errorsAxios) {
+        errorsAxios.response.data.forEach((error) => {
+          toast.error(error.msg, {
+            position: "bottom-center",
+            autoClose: 1000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
         });
-      });
+      }
     }
   };
 
