@@ -2,6 +2,8 @@ export const isObjEmpty = (obj) => {
   return Object.keys(obj).length === 0 && obj.constructor === Object;
 };
 
+export const colorCbvision = "#F4BF62";
+
 
 export const branchOptions = [
   {

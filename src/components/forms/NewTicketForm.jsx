@@ -168,7 +168,7 @@ const NewTicketForm = ({ errors, onSubmitCallback }) => {
       </Row>
 
       <div className="text-center">
-        <Button variant="primary" type="submit">
+        <Button variant="dark" type="submit">
           Crear
         </Button>
       </div>

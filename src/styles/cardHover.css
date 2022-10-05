@@ -1,0 +1,5 @@
+#customCard:hover {
+  transform: scale(1.02);
+  cursor: pointer;
+  background-color: #F4BF62;
+}

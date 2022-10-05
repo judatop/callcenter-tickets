@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Card, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import validator from "validator";
@@ -7,7 +7,6 @@ import { useAuthDispatch, useAuthState } from "../context/authContext";
 import { isObjEmpty } from "../helpers/helpers.js";
 import { loginUser } from "../services/UserService";
 import { toast } from "react-toastify";
-import Spinner from "react-bootstrap/Spinner";
 
 const Login = () => {
   const [errors, setErrors] = useState({});
@@ -44,6 +43,7 @@ const Login = () => {
         type: "login",
         token,
       });
+
       toast.success("Bienvenido " + username, {
         position: "bottom-center",
         autoClose: 1000,

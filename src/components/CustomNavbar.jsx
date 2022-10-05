@@ -26,9 +26,14 @@ const CustomNavbar = () => {
 
             <Navbar.Collapse id="responsive-navbar-nav" className="mr-5">
               <Nav className="me-auto">
-                <Nav.Link as={NavLink} to={NEW_TICKET_URL}>
+
+                {user.roles.includes("ADMIN") || user.roles.includes("CALLCENTER") && (
+                  <Nav.Link as={NavLink} to={NEW_TICKET_URL}>
                   Crear ticket
                 </Nav.Link>
+                )}
+
+                
                 <Nav.Link as={NavLink} to={TICKETS_URL}>
                   Mis tickets
                 </Nav.Link>

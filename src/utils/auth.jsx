@@ -2,13 +2,14 @@ import axios from "axios";
 const TOKEN_KEY = "token";
 import jwtDecode from "jwt-decode";
 
+
 const defaultUser = {
   id: "",
   username: "",
   token: "",
   office: "",
   roles: [],
-  isAuthenticated: false,
+  isAuthenticated: false
 };
 
 const setToken = (token) => {
@@ -48,11 +49,11 @@ export const authenticate = (token) => {
   return {
     ...defaultUser,
     id: decoded.id_usuario,
-    username: decoded.user,
+    username: decoded.username,
     isAuthenticated: true,
     office: decoded.office_id,
     roles: decoded.roles,
-    token: _token,
+    token: _token
   };
 };
 
