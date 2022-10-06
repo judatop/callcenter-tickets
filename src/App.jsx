@@ -15,7 +15,7 @@ import { SocketContext, socket } from "./context/socketContext.jsx";
 //moment config
 import moment from 'moment';
 import 'moment/locale/es';
-moment.locale('es');
+moment.locale('es-mx');
 
 const App = () => {
 

@@ -30,35 +30,60 @@ import { colorCbvision } from "../helpers/helpers.js";
 import cardHover from "../styles/cardHover.css";
 import { GET_DETAILS_ORDER_ENDPOINT } from "../helpers/endpoints.js";
 import moment from "moment";
-const socket = io(API_ENDPOINT);
+
+import validator from "validator";
+import { toast } from "react-toastify";
 
 const Tickets = () => {
   const [orders, setOrders] = useState([]);
-  const [orderSelected, setOrderSelected] = useState({});
+  const [orderSelected, setOrderSelected] = useState(null);
   const user = useAuthState();
   const [states, setStates] = useState([]);
   const [offices, setOffices] = useState([]);
-  const socketRef = useRef();
   const [observation, setObservation] = useState("");
   const [errors, setErrors] = useState({});
   const [observations, setObservations] = useState([]);
-
-  moment.locale("es");
+  const [socketConnected, setSocketConnected] = useState(false);
+  const socket = io(API_ENDPOINT);
 
   useEffect(() => {
-    socketRef.current = io.connect({ API_ENDPOINT });
+
     socket.emit("join", {
       office_id: user.office,
       roles: user.roles,
     });
 
     socket.on("new_message", (data) => {
-      console.log("recibido", data);
+      const orderId = data.order_id;
+      newObservation(orderId, data.username);
     });
   }, []);
 
-  // Obtenemos tickets
   useEffect(() => {
+    const getStates = async () => {
+      try {
+        const response = await axios.get(GET_STATES_ENDPOINT, {
+          headers: { Authorization: user.token },
+        });
+        setStates(response.data.states);
+      } catch (errorsAxios) {
+        console.log(errorsAxios);
+      }
+    };
+
+    const getOffices = async () => {
+      try {
+        const response = await axios.get(GET_OFFICES_ENDPOINT, {
+          headers: { Authorization: user.token },
+        });
+        setOffices(response.data.offices);
+      } catch (errorsAxios) {
+        console.log(errorsAxios);
+      }
+    };
+
+    // Obtenemos tickets
+
     const getOrders = async () => {
       try {
         const response = await axios.get(GET_ORDERS_ENDPOINT, {
@@ -83,32 +108,46 @@ const Tickets = () => {
       }
     };
 
-    const getStates = async () => {
-      try {
-        const response = await axios.get(GET_STATES_ENDPOINT, {
-          headers: { Authorization: user.token },
-        });
-        setStates(response.data.states);
-      } catch (errorsAxios) {
-        console.log(errorsAxios);
-      }
-    };
-
-    const getOffices = async () => {
-      try {
-        const response = await axios.get(GET_OFFICES_ENDPOINT, {
-          headers: { Authorization: user.token },
-        });
-        setOffices(response.data.offices);
-      } catch (errorsAxios) {
-        console.log(errorsAxios);
-      }
-    };
-
     getStates();
     getOffices();
     getOrders();
   }, []);
+
+  const newObservation = async (idOrder, username) => {
+    try {
+      const response = await axios.get(GET_ORDERS_ENDPOINT, {
+        headers: { Authorization: user.token },
+      });
+      const orders = response.data.orders;
+
+      const orderSelected = orders.filter((order) => order.id === idOrder)[0];
+
+      const response2 = await axios.get(
+        GET_DETAILS_ORDER_ENDPOINT + "/" + idOrder,
+        {
+          headers: { Authorization: user.token },
+        }
+      );
+      // Obtenemos observaciones de la orden seleccionada
+      setOrders(orders);
+      setObservations(response2.data.Detalles);
+      setOrderSelected(orderSelected);
+
+      if (user.username !== username) {
+        toast.success("Nueva observacion de Orden N° " + idOrder, {
+          position: "top-right",
+          autoClose: false,
+          newestOnTop: false,
+          closeOnClick: false,
+          rtl: false,
+          pauseOnFocusLoss: true,
+          draggable: true
+        });
+      }
+    } catch (errorsAxios) {
+      console.log(errorsAxios);
+    }
+  };
 
   const selectTicket = async (event, idOrder) => {
     event.preventDefault();
@@ -136,14 +175,18 @@ const Tickets = () => {
   const sendObservation = (event, observation, orderSelected) => {
     event.preventDefault();
 
-    const data = {
-      office_id: orderSelected.office_id,
-      description: observation,
-      order_id: orderSelected.id,
-      username: user.username,
-    };
+    if (!validator.isEmpty(observation)) {
+      const data = {
+        office_id: orderSelected.office_id,
+        description: observation,
+        order_id: orderSelected.id,
+        username: user.username,
+      };
 
-    socket.emit("new_message", data);
+      socket.emit("new_message", data);
+
+      setObservation("");
+    }
   };
 
   return (
@@ -152,17 +195,18 @@ const Tickets = () => {
         <Col xs="12" sm="12" md="6" lg="6" className="p-3">
           <Card>
             <Card.Header className="text-center p-3">
-              <Card.Title>Tickets asignados</Card.Title>
+              <Card.Title>Ordenes asignadas</Card.Title>
               <Card.Subtitle className="mb-2 text-muted">
                 {user.roles.includes("ADMIN") ||
                 user.roles.includes("CALLCENTER") ? (
-                  <div>{orders.length} tickets</div>
+                  <div>{orders.length} ordenes</div>
                 ) : (
                   <div>
                     {
                       orders.filter((order) => order.office_id === user.office)
                         .length
-                    }
+                    }{" "}
+                    ordenes
                   </div>
                 )}
               </Card.Subtitle>
@@ -182,7 +226,7 @@ const Tickets = () => {
                           <Row>
                             <Col xs="12" sm="12" md="10" lg="10">
                               <b>Orden N° {order.id}</b>
-                              <p>{moment(order.date).format('LLL')}</p>
+                              <p>{order.date}</p>
                               <p>{order.client_ruc}</p>
                               <p>{order.client_name}</p>
                               <p>{order.observation}</p>
@@ -237,7 +281,7 @@ const Tickets = () => {
         </Col>
         <Col xs="12" sm="12" md="6" lg="6" className="p-3">
           <Card>
-            {orderSelected.id ? (
+            {orderSelected ? (
               <Card.Body>
                 <Card.Title className="text-center">
                   Orden N° {orderSelected.id}
@@ -294,22 +338,30 @@ const Tickets = () => {
                       height: "50vh",
                       backgroundColor: "#F0F0F0",
                       overflowY: "scroll",
+                      display: "flex",
+                      flexDirection: "column-reverse",
                     }}
                   >
                     <ListGroup>
                       <ListGroupItem className="m-3 p-3 shadow-sm rounded">
-                        <div className="fw-bold">Tu</div>
+                        <div className="fw-bold">Motivo inicial</div>
                         <p>{orderSelected.observation}</p>
                       </ListGroupItem>
 
                       {observations.map((observation) => (
-                        
-                        <ListGroupItem className="m-3 p-3 shadow-sm rounded" key={observation.id}>
-
+                        <ListGroupItem
+                          className="m-3 p-3 shadow-sm rounded"
+                          key={observation.id}
+                        >
                           <div className="d-flex justify-content-between">
-                            <p className="fw-bold">{observation.username === user.username ? (<div>tu</div>): (<div>otro</div>)}</p>
-                            <p>{moment(observation.date).format('LLL')}</p>
-
+                            <p className="fw-bold">
+                              {observation.username === user.username ? (
+                                <div>Tu</div>
+                              ) : (
+                                <div>{observation.username}</div>
+                              )}
+                            </p>
+                            <p>{moment(observation.date).format("LLL")}</p>
                           </div>
                           <p>{observation.description}</p>
                         </ListGroupItem>

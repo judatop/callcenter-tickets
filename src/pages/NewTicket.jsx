@@ -37,8 +37,16 @@ const NewTicket = () => {
       errors.name = "El campo nombre es obligatorio";
     }
 
+    if (!validator.isLength(name, { max: 100 })) {
+      errors.name = "El campo nombre debe tener máximo 100 caracteres";
+    }
+
     if (validator.isEmpty(agreement)) {
       errors.agreement = "El campo contrato es obligatorio";
+    }
+
+    if (!validator.isLength(agreement, { max: 7 })) {
+      errors.agreement = "El campo nombre debe tener máximo 7 caracteres";
     }
 
     if (validator.isEmpty(office.name)) {
@@ -49,8 +57,16 @@ const NewTicket = () => {
       errors.phone = "El campo teléfono es obligatorio";
     }
 
+    if (!validator.isLength(phone, { max: 15 })) {
+      errors.phone = "El campo telefono debe tener máximo 15 caracteres";
+    }
+
     if (validator.isEmpty(observations)) {
       errors.observations = "El campo observaciones es obligatorio";
+    }
+
+    if (!validator.isLength(observations, { max: 300 })) {
+      errors.observations = "El campo observacion debe tener máximo 300 caracteres";
     }
 
     if (!isObjEmpty(errors)) {
