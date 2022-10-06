@@ -43,6 +43,8 @@ const Tickets = () => {
   const [errors, setErrors] = useState({});
   const [observations, setObservations] = useState([]);
 
+  moment.locale("es");
+
   useEffect(() => {
     socketRef.current = io.connect({ API_ENDPOINT });
     socket.emit("join", {
@@ -180,7 +182,7 @@ const Tickets = () => {
                           <Row>
                             <Col xs="12" sm="12" md="10" lg="10">
                               <b>Orden N° {order.id}</b>
-                              <p>{moment(order.date).fromNow()}</p>
+                              <p>{moment(order.date).format('LLL')}</p>
                               <p>{order.client_ruc}</p>
                               <p>{order.client_name}</p>
                               <p>{order.observation}</p>
@@ -301,8 +303,14 @@ const Tickets = () => {
                       </ListGroupItem>
 
                       {observations.map((observation) => (
+                        
                         <ListGroupItem className="m-3 p-3 shadow-sm rounded" key={observation.id}>
-                          <div className="fw-bold">{observation.date}</div>
+
+                          <div className="d-flex justify-content-between">
+                            <p className="fw-bold">{observation.username === user.username ? (<div>tu</div>): (<div>otro</div>)}</p>
+                            <p>{moment(observation.date).format('LLL')}</p>
+
+                          </div>
                           <p>{observation.description}</p>
                         </ListGroupItem>
                       ))}
