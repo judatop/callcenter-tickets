@@ -8,6 +8,7 @@ import { useAuthState } from "../context/authContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { TICKETS_URL } from "../helpers/urls.js";
 
 const NewTicket = () => {
   const user = useAuthState();
@@ -103,7 +104,7 @@ const NewTicket = () => {
           progress: undefined,
         });
       }
-      navigate("/tickets");
+      navigate(TICKETS_URL);
     } catch (errorsAxios) {
       console.log(errorsAxios);
       if (errorsAxios) {

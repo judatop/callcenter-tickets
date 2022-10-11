@@ -54,7 +54,7 @@ const Login = () => {
         draggable: true,
         progress: undefined,
       });
-      navigate("/home");
+      navigate(HOME_URL);
     } catch (errorsAxios) {
       console.log(errorsAxios);
       if (errorsAxios) {
