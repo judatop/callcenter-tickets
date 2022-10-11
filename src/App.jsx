@@ -12,10 +12,6 @@ import NewTicket from "./pages/NewTicket.jsx";
 import Tickets from "./pages/Tickets.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import { SocketContext, socket } from "./context/socketContext.jsx";
-//moment config
-import moment from 'moment';
-import 'moment/locale/es';
-moment.locale('es-mx');
 
 const App = () => {
 

@@ -235,15 +235,15 @@ const Tickets = () => {
               <Card.Subtitle className="mb-2 text-muted">
                 {user.roles.includes("ADMIN") ||
                 user.roles.includes("CALLCENTER") ? (
-                  <div>{orders.length} ordenes</div>
+                  <p>{orders.length} ordenes</p>
                 ) : (
-                  <div>
+                  <p>
                     {
                       orders.filter((order) => order.office_id === user.office)
                         .length
                     }{" "}
                     ordenes
-                  </div>
+                  </p>
                 )}
               </Card.Subtitle>
             </Card.Header>
@@ -253,35 +253,34 @@ const Tickets = () => {
                 user.roles.includes("CALLCENTER") ? (
                   <div style={{ height: "70vh", overflowY: "scroll" }}>
                     {orders.map((order) => (
-                      <div key={order.id}>
-                        <ListGroup.Item
-                          className="shadow-sm m-3 rounded"
-                          id="customCard"
-                          onClick={(event) => selectTicket(event, order.id)}
-                        >
-                          <Row>
-                            <Col xs="12" sm="12" md="10" lg="10">
-                              <b>Orden N° {order.id}</b>
-                              <p>{order.date}</p>
-                              <p>{order.client_name}</p>
-                              <p>- {order.observation}</p>
-                            </Col>
-                            <Col
-                              xs="12"
-                              sm="12"
-                              md="2"
-                              lg="2"
-                              className="text-end align-self-center"
-                            ></Col>
-                          </Row>
-                        </ListGroup.Item>
-                      </div>
+                      <ListGroup.Item
+                        className="shadow-sm m-3 rounded"
+                        id="customCard"
+                        onClick={(event) => selectTicket(event, order.id)}
+                        key={order.id}
+                      >
+                        <Row>
+                          <Col xs="12" sm="12" md="10" lg="10">
+                            <b>Orden N° {order.id}</b>
+                            <p>{order.date}</p>
+                            <p>{order.client_name}</p>
+                            <p>- {order.observation}</p>
+                          </Col>
+                          <Col
+                            xs="12"
+                            sm="12"
+                            md="2"
+                            lg="2"
+                            className="text-end align-self-center"
+                          ></Col>
+                        </Row>
+                      </ListGroup.Item>
                     ))}
                   </div>
                 ) : (
                   <div>
                     {orders.map((order) => (
-                      <div key={order.id}>
+                      <div key={order.id} as="span">
                         {order.office_id === user.office && (
                           <ListGroup.Item
                             className="shadow-sm m-3 rounded"
@@ -396,10 +395,11 @@ const Tickets = () => {
                       display: "flex",
                       flexDirection: "column-reverse",
                     }}
+                    as="span"
                   >
                     <ListGroup>
                       <ListGroupItem className="m-3 p-3 shadow-sm rounded">
-                        <div className="fw-bold">Motivo inicial</div>
+                        <p className="fw-bold">Motivo inicial</p>
                         <p>{orderSelected.observation}</p>
                       </ListGroupItem>
 
@@ -408,17 +408,20 @@ const Tickets = () => {
                           className="m-3 p-3 shadow-sm rounded"
                           key={observation.id}
                         >
-                          <div className="d-flex justify-content-between">
-                            <p className="fw-bold">
+                          <div
+                            className="d-flex justify-content-between"
+                            as="span"
+                          >
+                            <p className="fw-bold" as="span">
                               {observation.username === user.username ? (
-                                <p>Tu</p>
+                                <span>Tu</span>
                               ) : (
-                                <p>{observation.username}</p>
+                                <span>{observation.username}</span>
                               )}
                             </p>
-                            <p>{moment(observation.date).format("LLL")}</p>
+                            <p>{observation.date}</p>
                           </div>
-                          <p>{observation.description}</p>
+                          <p as="span">{observation.description}</p>
                         </ListGroupItem>
                       ))}
                     </ListGroup>
