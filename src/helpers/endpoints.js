@@ -1,4 +1,4 @@
-export const API_ENDPOINT = "http://localhost:5000";
+export const API_ENDPOINT = "https://9199-45-171-120-3.sa.ngrok.io";
 
 export const LOGIN_ENDPOINT = API_ENDPOINT + "/login";
 export const GET_ORDERS_ENDPOINT = API_ENDPOINT + "/orders";
