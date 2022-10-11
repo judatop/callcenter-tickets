@@ -7,6 +7,7 @@ import { useAuthDispatch, useAuthState } from "../context/authContext";
 import { isObjEmpty } from "../helpers/helpers.js";
 import { loginUser } from "../services/UserService";
 import { toast } from "react-toastify";
+import {HOME_URL} from "../helpers/urls.js";
 
 const Login = () => {
   const [errors, setErrors] = useState({});
@@ -16,7 +17,7 @@ const Login = () => {
 
   useEffect(() => {
     if (user.isAuthenticated) {
-      navigate("/home");
+      navigate(HOME_URL);
     }
   });
 

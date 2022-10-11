@@ -1,7 +1,7 @@
 import React from "react";
 import { Nav, Navbar, NavDropdown, Container } from "react-bootstrap";
 import { Navigate, NavLink, useNavigate } from "react-router-dom";
-import { HOME_URL, NEW_TICKET_URL, TICKETS_URL } from "../helpers/urls.js";
+import { HOME_URL, NEW_TICKET_URL, TICKETS_URL, LOGIN_URL } from "../helpers/urls.js";
 import { useAuthDispatch, useAuthState } from "../context/authContext";
 
 const CustomNavbar = () => {
@@ -13,7 +13,7 @@ const CustomNavbar = () => {
     authDispatch({
       type: "logout",
     });
-    navigate("/login");
+    navigate(LOGIN_URL);
   };
 
   return (

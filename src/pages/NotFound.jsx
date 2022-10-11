@@ -5,6 +5,7 @@ import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import { useNavigate } from "react-router-dom";
+import {HOME_URL} from "../helpers/urls.js";
 
 const NotFound = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const NotFound = () => {
             Parece que esta página no existe, por favor verifique la URL o pulse
             el botón para ir a la página principal.
           </Card.Text>
-          <Button variant="primary" onClick={() => navigate("/home")}>
+          <Button variant="primary" onClick={() => navigate(HOME_URL)}>
             Ir a la página principal
           </Button>
         </Card.Body>

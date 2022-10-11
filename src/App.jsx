@@ -12,6 +12,7 @@ import NewTicket from "./pages/NewTicket.jsx";
 import Tickets from "./pages/Tickets.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import { SocketContext, socket } from "./context/socketContext.jsx";
+import {DEFAULT_URL, LOGIN_URL, HOME_URL, NEW_TICKET_URL, TICKETS_URL} from "./helpers/urls.js";
 
 const App = () => {
 
@@ -23,12 +24,12 @@ const App = () => {
 
         <Routes>
           <Route element={<PrivateRoutes />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/newticket" element={<NewTicket />} />
-            <Route path="/tickets" element={<Tickets />} />
+            <Route path={DEFAULT_URL} element={<Home />} />
+            <Route path={HOME_URL} element={<Home />} />
+            <Route path={NEW_TICKET_URL} element={<NewTicket />} />
+            <Route path={TICKETS_URL} element={<Tickets />} />
           </Route>
-          <Route element={<Login />} path="/login" />
+          <Route  path={LOGIN_URL} element={<Login />} />
           <Route element={<NotFound />} path="*" />
         </Routes>
       </SocketContext.Provider>
