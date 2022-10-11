@@ -18,6 +18,7 @@ import {
   GET_ORDERS_ENDPOINT,
   GET_STATES_ENDPOINT,
   GET_OFFICES_ENDPOINT,
+  CHANGE_STATE_ORDER_ENDPOINT,
 } from "../helpers/endpoints.js";
 import io from "socket.io-client";
 import { API_ENDPOINT } from "../helpers/endpoints";
@@ -30,9 +31,10 @@ import { colorCbvision } from "../helpers/helpers.js";
 import cardHover from "../styles/cardHover.css";
 import { GET_DETAILS_ORDER_ENDPOINT } from "../helpers/endpoints.js";
 import moment from "moment";
-
 import validator from "validator";
 import { toast } from "react-toastify";
+import { GoLocation } from "react-icons/go";
+const socket = io(API_ENDPOINT);
 
 const Tickets = () => {
   const [orders, setOrders] = useState([]);
@@ -44,20 +46,6 @@ const Tickets = () => {
   const [errors, setErrors] = useState({});
   const [observations, setObservations] = useState([]);
   const [socketConnected, setSocketConnected] = useState(false);
-  const socket = io(API_ENDPOINT);
-
-  useEffect(() => {
-
-    socket.emit("join", {
-      office_id: user.office,
-      roles: user.roles,
-    });
-
-    socket.on("new_message", (data) => {
-      const orderId = data.order_id;
-      newObservation(orderId, data.username);
-    });
-  }, []);
 
   useEffect(() => {
     const getStates = async () => {
@@ -82,36 +70,53 @@ const Tickets = () => {
       }
     };
 
-    // Obtenemos tickets
-
-    const getOrders = async () => {
-      try {
-        const response = await axios.get(GET_ORDERS_ENDPOINT, {
-          headers: { Authorization: user.token },
-        });
-        setOrders(response.data.orders);
-      } catch (errorsAxios) {
-        console.log(errorsAxios);
-        if (errorsAxios) {
-          errorsAxios.response.data.forEach((error) => {
-            toast.error(error.msg, {
-              position: "bottom-center",
-              autoClose: 1000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-          });
-        }
-      }
-    };
-
     getStates();
     getOffices();
     getOrders();
+
+    socket.emit("join", {
+      office_id: user.office,
+      roles: user.roles,
+    });
+
+    socket.on("new_message", (data) => {
+      const orderId = data.order_id;
+      newObservation(orderId, data.username);
+    });
+
+    socket.on("new_order", (data) => {
+      getOrders();
+    });
+
+    socket.on("new_state", (data) => {
+      getOrders();
+      setOrderSelected(null);
+    });
   }, []);
+
+  const getOrders = async () => {
+    try {
+      const response = await axios.get(GET_ORDERS_ENDPOINT, {
+        headers: { Authorization: user.token },
+      });
+      setOrders(response.data.orders);
+    } catch (errorsAxios) {
+      console.log(errorsAxios);
+      if (errorsAxios) {
+        errorsAxios.response.data.forEach((error) => {
+          toast.error(error.msg, {
+            position: "bottom-center",
+            autoClose: 1000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        });
+      }
+    }
+  };
 
   const newObservation = async (idOrder, username) => {
     try {
@@ -141,7 +146,7 @@ const Tickets = () => {
           closeOnClick: false,
           rtl: false,
           pauseOnFocusLoss: true,
-          draggable: true
+          draggable: true,
         });
       }
     } catch (errorsAxios) {
@@ -189,6 +194,37 @@ const Tickets = () => {
     }
   };
 
+  const closeTicket = async (event, orderSelected) => {
+    try {
+      event.preventDefault();
+      const response = await axios.post(
+        CHANGE_STATE_ORDER_ENDPOINT + "/" + orderSelected.id + "/state",
+        {
+          state_id: 3,
+        },
+        {
+          headers: { Authorization: user.token },
+        }
+      );
+      4;
+      if (response.status === 200) {
+        toast.success("Orden N° " + orderSelected.id + " cerrada!", {
+          position: "top-right",
+          autoClose: false,
+          newestOnTop: false,
+          closeOnClick: false,
+          rtl: false,
+          pauseOnFocusLoss: true,
+          draggable: true,
+        });
+        getOrders();
+        setOrderSelected(null);
+      }
+    } catch (errorsAxios) {
+      console.log(errorsAxios);
+    }
+  };
+
   return (
     <Container>
       <Row>
@@ -227,9 +263,8 @@ const Tickets = () => {
                             <Col xs="12" sm="12" md="10" lg="10">
                               <b>Orden N° {order.id}</b>
                               <p>{order.date}</p>
-                              <p>{order.client_ruc}</p>
                               <p>{order.client_name}</p>
-                              <p>{order.observation}</p>
+                              <p>- {order.observation}</p>
                             </Col>
                             <Col
                               xs="12"
@@ -257,7 +292,6 @@ const Tickets = () => {
                               <Col xs="12" sm="12" md="10" lg="10">
                                 <b>Orden N° {order.id}</b>
                                 <p>{order.date}</p>
-                                <p>{order.client_ruc}</p>
                                 <p>{order.client_name}</p>
                                 <p>{order.observation}</p>
                               </Col>
@@ -286,11 +320,32 @@ const Tickets = () => {
                 <Card.Title className="text-center">
                   Orden N° {orderSelected.id}
                 </Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">
-                  {/* {orderSelected.states.map((state) => state.state)} */}
+
+                <Card.Subtitle className="mb-2 text-muted text-center">
+                  Estado:{" "}
+                  {orderSelected.states[orderSelected.states.length - 1].state}
                 </Card.Subtitle>
+
+                <Card.Text className="text-center">
+                  {user.roles.includes("ADMIN") ||
+                    (user.roles.includes("CALLCENTER") && (
+                      <Button
+                        onClick={(event) => closeTicket(event, orderSelected)}
+                      >
+                        Cerrar ticket
+                      </Button>
+                    ))}
+                </Card.Text>
+
                 <ListGroup>
                   <Row className="mt-3 mb-3">
+                    <Col xs="12" sm="12" md="12" lg="12">
+                      <ListGroup.Item className="d-flex align-items-center gap-3">
+                        <GoLocation />{" "}
+                        {offices[orderSelected.office_id - 1].name}
+                      </ListGroup.Item>
+                    </Col>
+
                     <Col xs="12" sm="12" md="12" lg="12">
                       <ListGroup.Item className="d-flex align-items-center gap-3">
                         <HiIdentification /> {orderSelected.client_ruc}
@@ -356,9 +411,9 @@ const Tickets = () => {
                           <div className="d-flex justify-content-between">
                             <p className="fw-bold">
                               {observation.username === user.username ? (
-                                <div>Tu</div>
+                                <p>Tu</p>
                               ) : (
-                                <div>{observation.username}</div>
+                                <p>{observation.username}</p>
                               )}
                             </p>
                             <p>{moment(observation.date).format("LLL")}</p>
