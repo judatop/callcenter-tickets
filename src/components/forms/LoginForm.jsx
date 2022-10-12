@@ -19,7 +19,7 @@ const LoginForm = ({ errors, onSubmitCallback }) => {
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          placeholder="Correo electronico"
+          placeholder="Nombre de usuario"
           isInvalid={errors.username}
         />
         <Form.Control.Feedback type="invalid">
