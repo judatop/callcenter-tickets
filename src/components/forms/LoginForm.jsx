@@ -15,7 +15,7 @@ const LoginForm = ({ errors, onSubmitCallback }) => {
     <Form onSubmit={submitForm}>
       <Form.Group control="username">
         <Form.Label>Usuario</Form.Label>
-        <Form.Control
+        <Form.Control 
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}

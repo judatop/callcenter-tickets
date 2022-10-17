@@ -25,6 +25,7 @@ const removeToken = () => {
 };
 
 export const authenticate = (token) => {
+
   if (token) {
     setToken(token);
   }
@@ -39,7 +40,7 @@ export const authenticate = (token) => {
 
   const currentTime = Date.now() / 1000;
 
-  if (decoded.expiration < currentTime) {
+  if (decoded.exp < currentTime) {
     removeToken();
     return { ...defaultUser };
   }

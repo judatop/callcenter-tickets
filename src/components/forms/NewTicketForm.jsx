@@ -3,13 +3,13 @@ import { Form, Button, Row, Col } from "react-bootstrap";
 import {
   GET_STATES_ENDPOINT,
   GET_OFFICES_ENDPOINT,
+  GET_PROBLEMS_ENDPOINT,
 } from "../../helpers/endpoints";
 import { useAuthState } from "../../context/authContext.jsx";
 import axios from "axios";
 
 const NewTicketForm = ({ errors, onSubmitCallback }) => {
   const user = useAuthState();
-  const [id, setId] = useState(""); // identificacion del cliente
   const [name, setName] = useState(""); // nombre del cliente
   const [agreement, setAgreement] = useState(""); // contrato
   const [branch, setBranch] = useState(""); // sucursal
@@ -17,6 +17,8 @@ const NewTicketForm = ({ errors, onSubmitCallback }) => {
   const [observations, setObservations] = useState(""); // observaciones
   const [states, setStates] = useState([]);
   const [offices, setOffices] = useState([]);
+  const [problems, setProblems] = useState([]);
+  const [selectedProblem, setSelectedProblem] = useState("");
 
   useEffect(() => {
     const getStates = async () => {
@@ -25,8 +27,8 @@ const NewTicketForm = ({ errors, onSubmitCallback }) => {
           headers: { Authorization: user.token },
         });
         setStates(response.data.states);
-      } catch (errorsAxios) {
-        console.log(errorsAxios);
+      } catch (errors) {
+        console.log(errors);
       }
     };
 
@@ -37,49 +39,44 @@ const NewTicketForm = ({ errors, onSubmitCallback }) => {
         });
         setBranch(response.data.offices[0].name); // definimos por defecto la primera sucursal
         setOffices(response.data.offices);
-      } catch (errorsAxios) {
-        console.log(errorsAxios);
+      } catch (errors) {
+        console.log(errors);
+      }
+    };
+
+    const getProblems = async () => {
+      try {
+        const response = await axios.get(GET_PROBLEMS_ENDPOINT, {
+          headers: { Authorization: user.token },
+        });
+        setSelectedProblem(response.data.problems[0].name);
+        setProblems(response.data.problems);
+      } catch (errors) {
+        console.log(errors);
       }
     };
 
     getStates();
     getOffices();
+    getProblems();
   }, []);
 
   const submitForm = (e) => {
     e.preventDefault();
-
     onSubmitCallback(
-      id,
       name,
       agreement,
       offices.find((office) => office.name === branch),
       phone,
       observations,
-      states.find((state) => state.state === "Generado")
+      problems.find((problem) => problem.name === selectedProblem)
     );
   };
 
   return (
     <Form onSubmit={submitForm}>
       <Row>
-        <Col xs="12" sm="12" md="5" lg="5">
-          <Form.Group className="mb-3" control="id">
-            <Form.Label>Identificación</Form.Label>
-            <Form.Control
-              type="number"
-              pattern="[0-9]*"
-              value={id}
-              onChange={(e) => setId(e.target.value)}
-              isInvalid={errors.id}
-              placeholder="Ej. 0107876419001"
-            />
-            <Form.Control.Feedback type="invalid">
-              {errors.id}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Col>
-        <Col xs="12" sm="12" md="7" lg="7">
+        <Col xs="12" sm="12" md="8" lg="8">
           <Form.Group className="mb-3" control="name">
             <Form.Label>Nombre del cliente</Form.Label>
             <Form.Control
@@ -91,6 +88,23 @@ const NewTicketForm = ({ errors, onSubmitCallback }) => {
             />
             <Form.Control.Feedback type="invalid">
               {errors.name}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+        <Col xs="12" sm="12" md="4" lg="4">
+          <Form.Group className="mb-3" control="selectedProblem">
+            <Form.Label>Problemas</Form.Label>
+            <Form.Select
+              value={selectedProblem}
+              onChange={(e) => setSelectedProblem(e.target.value)}
+              isInvalid={errors.selectedProblem}
+            >
+              {problems.map((item, index) => (
+                <option key={index}>{item.name}</option>
+              ))}
+            </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              {errors.selectedProblem}
             </Form.Control.Feedback>
           </Form.Group>
         </Col>
@@ -169,7 +183,7 @@ const NewTicketForm = ({ errors, onSubmitCallback }) => {
 
       <div className="text-center">
         <Button variant="dark" type="submit">
-          Crear
+          Crear ticket
         </Button>
       </div>
     </Form>

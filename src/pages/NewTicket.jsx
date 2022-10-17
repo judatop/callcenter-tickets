@@ -16,23 +16,15 @@ const NewTicket = () => {
   const [errors, setErrors] = useState({});
 
   const newTicket = async (
-    id,
     name,
     agreement,
     office,
     phone,
     observations,
-    state
+    problem
   ) => {
+
     const errors = {};
-
-    if (validator.isEmpty(id)) {
-      errors.id = "El campo identificación es obligatorio";
-    }
-
-    if (!validator.isLength(id, { max: 13 })) {
-      errors.id = "El campo identificacion debe tener máximo 13 caracteres";
-    }
 
     if (validator.isEmpty(name)) {
       errors.name = "El campo nombre es obligatorio";
@@ -70,19 +62,23 @@ const NewTicket = () => {
       errors.observations = "El campo observacion debe tener máximo 300 caracteres";
     }
 
+    if (validator.isEmpty(problem.name)) {
+      errors.problem = "El campo problema es obligatorio";
+    }
+
     if (!isObjEmpty(errors)) {
       setErrors(errors);
       return;
     }
 
     const jsonRequest = {
-      client_ruc: id,
       client_name: name,
       contract: parseInt(agreement),
       observation: observations,
       office_id: office.id,
       phone: phone,
       user_id: user.id,
+      problem_id: problem.id
     };
 
     try {
@@ -129,7 +125,6 @@ const NewTicket = () => {
         <Col sm="12" lg={{ span: 10, offset: 1 }}>
           <Card body>
             {errors.newpost && <Alert variant="danger">{errors.auth}</Alert>}
-
             <h3>Crear ticket</h3>
             <hr></hr>
             <NewTicketForm
