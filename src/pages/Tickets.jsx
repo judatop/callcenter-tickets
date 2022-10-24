@@ -38,7 +38,9 @@ import moment from "moment";
 import validator from "validator";
 import { toast } from "react-toastify";
 import { GoLocation } from "react-icons/go";
-const socket = io(API_ENDPOINT);
+import { useSocketState } from "../context/SocketProvider.jsx";
+import { useNavigate } from "react-router-dom";
+import { TICKET_DETAIL_URL } from "../helpers/urls.js";
 
 const Tickets = () => {
   const [showOrders, setShowOrders] = useState(true);
@@ -52,6 +54,9 @@ const Tickets = () => {
   const [errors, setErrors] = useState({});
   const [observations, setObservations] = useState([]);
   const [socketConnected, setSocketConnected] = useState(false);
+  const socketContext = useSocketState();
+  const socket = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getStates = async () => {
@@ -78,23 +83,29 @@ const Tickets = () => {
 
     getStates();
     getOffices();
-    getOrders();
+    getOrders();  
 
-    socket.emit("join", {
+    if(!socketContext.socket.current){
+      socketContext.connectSocket();
+    }
+
+    socket.current = socketContext.socket.current;
+
+    socket.current.emit("join", {
       office_id: user.office,
       roles: user.roles,
     });
 
-    socket.on("new_message", (data) => {
+    socket.current.on("new_message", (data) => {
       const orderId = data.order_id;
       newObservation(orderId, data.username);
     });
 
-    socket.on("new_order", (data) => {
+    socket.current.on("new_order", (data) => {
       getOrders();
     });
 
-    socket.on("new_state", (data) => {
+    socket.current.on("new_state", (data) => {
       getOrders();
       setOrderSelected(null);
     });
@@ -105,7 +116,7 @@ const Tickets = () => {
       const response = await axios.get(GET_ORDERS_ENDPOINT, {
         headers: { Authorization: user.token },
       });
-      setOrders(response.data.orders);
+      setOrders(response.data.tickets);
     } catch (errorsAxios) {
       console.log(errorsAxios);
       if (errorsAxios) {
@@ -161,11 +172,17 @@ const Tickets = () => {
   };
 
   const selectTicket = async (idOrder) => {
-    const orderSelected = orders.filter((order) => order.id === idOrder)[0];
-    getObservationsByOrder(idOrder);
-    setOrderSelected(orderSelected);
-    setShowOrders(false);
-    setShowOrderSelected(true);
+
+    navigate("/ticket/" + idOrder);
+
+
+    // const orderSelected = orders.filter((order) => order.id === idOrder)[0];
+    // getObservationsByOrder(idOrder);
+    // setOrderSelected(orderSelected);
+    // setShowOrders(false);
+    // setShowOrderSelected(true);
+
+
   };
 
   const getObservationsByOrder = async (idOrder) => {
@@ -193,7 +210,7 @@ const Tickets = () => {
         username: user.username,
       };
 
-      socket.emit("new_message", data);
+      socket.current.emit("new_message", data);
 
       setObservation("");
     }

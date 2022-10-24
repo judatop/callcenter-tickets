@@ -2,7 +2,6 @@ import axios from "axios";
 const TOKEN_KEY = "token";
 import jwtDecode from "jwt-decode";
 
-
 const defaultUser = {
   id: "",
   username: "",
@@ -24,7 +23,7 @@ const removeToken = () => {
   localStorage.removeItem(TOKEN_KEY);
 };
 
-export const authenticate = (token) => {
+export const authenticate = (token, socket) => {
 
   if (token) {
     setToken(token);
@@ -40,13 +39,14 @@ export const authenticate = (token) => {
 
   const currentTime = Date.now() / 1000;
 
+
   if (decoded.exp < currentTime) {
     removeToken();
     return { ...defaultUser };
   }
 
   axios.defaults.headers.common["Authorization"] = token;
-
+  
   return {
     ...defaultUser,
     id: decoded.id_usuario,

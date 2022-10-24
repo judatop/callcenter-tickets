@@ -7,17 +7,19 @@ import { useAuthDispatch, useAuthState } from "../context/authContext";
 import { isObjEmpty } from "../helpers/helpers.js";
 import { loginUser } from "../services/UserService";
 import { toast } from "react-toastify";
-import {HOME_URL} from "../helpers/urls.js";
+import {TICKETS_URL} from "../helpers/urls.js";
+import {useSocketState} from "../context/SocketProvider.jsx";
 
 const Login = () => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const authDispatch = useAuthDispatch();
   const user = useAuthState();
+  const socket = useSocketState();
 
   useEffect(() => {
     if (user.isAuthenticated) {
-      navigate(HOME_URL);
+      navigate(TICKETS_URL);
     }
   });
 
@@ -45,6 +47,11 @@ const Login = () => {
         token,
       });
 
+      // login exitoso, creamos socket
+      socket.connectSocket();
+      
+
+
       toast.success("Bienvenido " + username, {
         position: "bottom-center",
         autoClose: 1000,
@@ -54,7 +61,7 @@ const Login = () => {
         draggable: true,
         progress: undefined,
       });
-      navigate(HOME_URL);
+      navigate(TICKETS_URL);
     } catch (errorsAxios) {
       console.log(errorsAxios);
       if (errorsAxios) {

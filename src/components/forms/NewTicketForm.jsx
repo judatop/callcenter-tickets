@@ -78,7 +78,7 @@ const NewTicketForm = ({ errors, onSubmitCallback }) => {
       <Row>
         <Col xs="12" sm="12" md="8" lg="8">
           <Form.Group className="mb-3" control="name">
-            <Form.Label>Nombre del cliente</Form.Label>
+            <Form.Label>Cliente que llama</Form.Label>
             <Form.Control
               type="text"
               value={name}
@@ -93,7 +93,7 @@ const NewTicketForm = ({ errors, onSubmitCallback }) => {
         </Col>
         <Col xs="12" sm="12" md="4" lg="4">
           <Form.Group className="mb-3" control="selectedProblem">
-            <Form.Label>Problemas</Form.Label>
+            <Form.Label>Problema reportado</Form.Label>
             <Form.Select
               value={selectedProblem}
               onChange={(e) => setSelectedProblem(e.target.value)}

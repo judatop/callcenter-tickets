@@ -4,6 +4,7 @@ import produce from "immer";
 export const authInitialState = authenticate();
 
 export const AuthReducer = produce((state, action) => {
+
   switch (action.type) {
     case "login":
       state = authenticate(action.token);

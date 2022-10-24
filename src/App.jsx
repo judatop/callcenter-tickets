@@ -3,6 +3,7 @@ import PrivateRoutes from "./utils/PrivateRoutes.jsx";
 import CustomNavbar from "./components/CustomNavbar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { AuthProvider } from "./context/authContext";
+import { SocketProvider } from "./context/SocketProvider";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import React from "react";
@@ -11,14 +12,23 @@ import Home from "./pages/Home.jsx";
 import NewTicket from "./pages/NewTicket.jsx";
 import Tickets from "./pages/Tickets.jsx";
 import NotFound from "./pages/NotFound.jsx";
-import { SocketContext, socket } from "./context/socketContext.jsx";
-import {DEFAULT_URL, LOGIN_URL, HOME_URL, NEW_TICKET_URL, TICKETS_URL} from "./helpers/urls.js";
+import Report from "./pages/Report.jsx";
+
+import {
+  DEFAULT_URL,
+  LOGIN_URL,
+  HOME_URL,
+  NEW_TICKET_URL,
+  TICKETS_URL,
+  REPORT_URL,
+  TICKET_DETAIL_URL
+} from "./helpers/urls.js";
+import TicketDetail from "./pages/TicketDetail.jsx";
 
 const App = () => {
-
   return (
     <AuthProvider>
-      <SocketContext.Provider value={socket}>
+      <SocketProvider>
         <ToastContainer />
         <CustomNavbar />
 
@@ -28,11 +38,13 @@ const App = () => {
             <Route path={HOME_URL} element={<Home />} />
             <Route path={NEW_TICKET_URL} element={<NewTicket />} />
             <Route path={TICKETS_URL} element={<Tickets />} />
+            <Route path={REPORT_URL} element={<Report />} />
+            <Route path={TICKET_DETAIL_URL} element={<TicketDetail />} />
           </Route>
-          <Route  path={LOGIN_URL} element={<Login />} />
+          <Route path={LOGIN_URL} element={<Login />} />
           <Route element={<NotFound />} path="*" />
         </Routes>
-      </SocketContext.Provider>
+      </SocketProvider>
     </AuthProvider>
   );
 };
